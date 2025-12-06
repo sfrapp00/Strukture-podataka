@@ -1,0 +1,6 @@
+2025-11-08
+banana 2 4.99
+naranca 3 3.99
+kiwi 5 1.99
+jabuka 3 5.49
+mandarina 10 0.99
