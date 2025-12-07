@@ -6,20 +6,25 @@ int showReceipt(receiptP head) {
 	int run = 1;
 	int n = 1;
 	int userInput, i;
+	date dateMin = { .year = 0, .month = 0, .day = 0 };
+	date dateMax = { .year = MAX * MAX, .month = MAX, .day = MAX };
 	receiptP p;
+
+	inputDate(&dateMin, &dateMax);
 
 	while (run) {		//omogucava laksi pregled racuna jer se ne vraca na glavni meni
 		p = head->receiptNext;
 
 		while (p != NULL) {
-			printf("[%d] - %d-%d-%d\n", n++, p->date->year, p->date->month, p->date->day);
+			if (compareDate(p->date, &dateMin) == 1 && compareDate(&dateMax, p->date) == 1)
+				printf("[%d] - %d-%d-%d\n", n++, p->date->year, p->date->month, p->date->day);
 			p = p->receiptNext;
 		}
 
-		printf("[0] - Povratak\n");
+		printf("[0] - Povratak\n\n");
 
 		while (scanf(" %d", &userInput) != 1 || userInput < 0 || userInput > n - 1) {
-			printf("Neispravan unos. Pokusajte ponovo:\n");
+			printf("\nNeispravan unos. Pokusajte ponovo:\n");
 			while (getchar() != '\n');		//ciscenje buffera
 		}
 
@@ -57,9 +62,8 @@ int printReceipt(receiptP p) {
 	return 0;
 }
 
-int itemSearch(receiptP head) {
+int showItem(receiptP head) {
 	int found = 0;
-	int userInput;
 	char itemName[MAX];
 	int itemAmount = 0;
 	double itemPrice = 0;
@@ -71,35 +75,13 @@ int itemSearch(receiptP head) {
 	printf("Upisite ime namirnice:\n");
 
 	while (scanf(" %s", itemName) != 1) {
-		printf("Neispravan unos namirnice. Pokusajte ponovo:\n");
+		printf("\nNeispravan unos namirnice. Pokusajte ponovo:\n");
 		while (getchar() != '\n');		//ciscenje buffera
 	}
 
-	printf("Zelite li ograniciti pretragu na odredeni vremenski period\n"
-		"[1] - Da\n"
-		"[0] - Ne\n"
-	);
+	printf("\n");
 
-	while (scanf(" %d", &userInput) != 1 || userInput < 0 || userInput > 1) {
-		printf("Neispravan unos. Pokusajte ponovo:\n");
-		while (getchar() != '\n');		//ciscenje buffera
-	}
-
-	if (userInput) {
-		printf("Upisite od kojeg datuma zelite uvid (YYYY-MM-DD):\n");
-
-		while (scanf(" %4d-%2d-%2d", &dateMin.year, &dateMin.month, &dateMin.day) != 3 || !(validDate(&dateMin))) {
-			printf("Neispravan unos datuma. Pokusajte ponovo:\n");
-			while (getchar() != '\n');		//ciscenje buffera
-		}
-
-		printf("Upisite do kojeg datuma zelite uvid (YYYY-MM-DD):\n");
-
-		while (scanf(" %4d-%2d-%2d", &dateMax.year, &dateMax.month, &dateMax.day) != 3 || !(validDate(&dateMax))) {
-			printf("Neispravan unos datuma. Pokusajte ponovo:\n");
-			while (getchar() != '\n');		//ciscenje buffera
-		}
-	}
+	inputDate(&dateMin, &dateMax);
 
 	separatorUI();
 
@@ -120,9 +102,123 @@ int itemSearch(receiptP head) {
 	if (found)
 		printf("%-16s\t%d\t%.2f\n", itemName, itemAmount, itemPrice);		//foramtirani ispis
 	else
-		printf("Namirnica nije pronadena\n");
+		printf("\nNamirnica nije pronadena\n\n");
 
 	separatorUI();
+
+	return 0;
+}
+
+int highestValue(receiptP head) {
+	double PriceMax = 0;
+	double Price = 0;
+	date dateMin = { .year = 0, .month = 0, .day = 0 };
+	date dateMax = { .year = MAX * MAX, .month = MAX, .day = MAX };
+	receiptP p = head->receiptNext;
+	receiptP q = p;
+	itemP ip;
+
+	inputDate(&dateMin, &dateMax);
+
+	separatorUI();
+
+	while (p != NULL) {
+		ip = p->item->itemNext;
+		if (compareDate(p->date, &dateMin) == 1 && compareDate(&dateMax, p->date) == 1) {
+			while (ip != NULL) {
+				Price += ip->price * ip->amount;
+				ip = ip->itemNext;
+			}
+		}
+		if (Price > PriceMax) {
+			PriceMax = Price;
+			q = p;
+		}
+		Price = 0;
+		p = p->receiptNext;
+	}
+	
+	printf("Racun s najvecom potrosnjom je:\n");
+
+	printReceipt(q);
+
+	return 0;
+}
+
+int lowestValue(receiptP head) {
+	double PriceMin = MAX*MAX;
+	double Price = 0;
+	date dateMin = { .year = 0, .month = 0, .day = 0 };
+	date dateMax = { .year = MAX * MAX, .month = MAX, .day = MAX };
+	receiptP p = head->receiptNext;
+	receiptP q = p;
+	itemP ip;
+
+	inputDate(&dateMin, &dateMax);
+
+	separatorUI();
+
+	while (p != NULL) {
+		ip = p->item->itemNext;
+		if (compareDate(p->date, &dateMin) == 1 && compareDate(&dateMax, p->date) == 1) {
+			while (ip != NULL) {
+				Price += ip->price * ip->amount;
+				ip = ip->itemNext;
+			}
+		}
+		if (Price < PriceMin) {
+			PriceMin = Price;
+			q = p;
+		}
+		Price = 0;
+		p = p->receiptNext;
+	}
+
+	printf("Racun s najmanjom potrosnjom je:\n");
+
+	printReceipt(q);
+
+	return 0;
+}
+
+int itemSearch(receiptP head) {
+	int found = 0;
+	char itemName[MAX];
+	date dateMin = { .year = 0, .month = 0, .day = 0 };
+	date dateMax = { .year = MAX * MAX, .month = MAX, .day = MAX };
+	receiptP p = head->receiptNext;
+	itemP ip;
+
+	printf("Upisite ime namirnice:\n");
+
+	while (scanf(" %s", itemName) != 1) {
+		printf("\nNeispravan unos namirnice. Pokusajte ponovo:\n");
+		while (getchar() != '\n');		//ciscenje buffera
+	}
+
+	printf("\n");
+
+	inputDate(&dateMin, &dateMax);
+
+	separatorUI();
+
+	while (p != NULL) {
+		ip = p->item->itemNext;
+		found = 0;
+		if (compareDate(p->date, &dateMin) == 1 && compareDate(&dateMax, p->date) == 1) {
+			while (ip != NULL && !found) {
+				if (strcmp(itemName, ip->name) == 0) {
+					found = 1;
+					printReceipt(p);
+				}
+				ip = ip->itemNext;
+			}
+		}
+		p = p->receiptNext;
+	}
+
+	if (!found)
+		printf("\nNamirnica nije pronadena\n\n");
 
 	return 0;
 }

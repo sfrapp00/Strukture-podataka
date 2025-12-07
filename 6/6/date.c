@@ -61,3 +61,38 @@ int validDate(dateP d) {
 	}
 	return 0;
 }
+
+int inputDate(dateP dateMin, dateP dateMax) {
+	int userInput;
+
+	printf("Zelite li ograniciti pretragu na odredeni vremenski period\n"
+		"[1] - Da\n"
+		"[0] - Ne\n"
+		"\n"
+	);
+
+	while (scanf(" %d", &userInput) != 1 || userInput < 0 || userInput > 1) {
+		printf("\nNeispravan unos. Pokusajte ponovo:\n");
+		while (getchar() != '\n');		//ciscenje buffera
+	}
+
+	if (!userInput)
+		return 0;
+
+	printf("\nUpisite od kojeg datuma zelite uvid (YYYY-MM-DD):\n");
+
+	while (scanf(" %4d-%2d-%2d", &dateMin->year, &dateMin->month, &dateMin->day) != 3 || !(validDate(dateMin))) {
+		printf("\nNeispravan unos datuma. Pokusajte ponovo:\n");
+		while (getchar() != '\n');		//ciscenje buffera
+	}
+
+
+	printf("\nUpisite do kojeg datuma zelite uvid (YYYY-MM-DD):\n");
+
+	while (scanf(" %4d-%2d-%2d", &dateMax->year, &dateMax->month, &dateMax->day) != 3 || !(validDate(dateMax))) {
+		printf("\nNeispravan unos datuma. Pokusajte ponovo:\n");
+		while (getchar() != '\n');		//ciscenje buffera
+	}
+
+	return 0;
+}

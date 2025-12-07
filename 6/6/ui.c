@@ -9,13 +9,16 @@ int UI(receiptP head) {
 	while (run) {
 		printf("Naredbe:\n"
 			"[1] - Prikaz racuna\n"
-			"[2] - Prikaz namirnica\n"
+			"[2] - Prikaz trazene namirnice\n"
+			"[3] - Racun s najvecom potrosnjom\n"
+			"[4] - Racun s najmanjom potrosnjom\n"
+			"[5] - Prikaz svih racuna s trazenom namirnicom\n"
 			"[0] - Ugasi program\n"
 			"\n"
 		);
 
 		while (scanf(" %d", &userInput) != 1) {
-			printf("Neispravan unos. Pokusajte ponovo:\n");
+			printf("\nNeispravan unos. Pokusajte ponovo:\n");
 			while (getchar() != '\n');		//ciscenje buffera
 		}
 
@@ -30,10 +33,19 @@ int UI(receiptP head) {
 			showReceipt(head);
 			break;
 		case 2:
+			showItem(head);
+			break;
+		case 3:
+			highestValue(head);
+			break;
+		case 4:
+			lowestValue(head);
+			break;
+		case 5:
 			itemSearch(head);
 			break;
 		default:
-			printf("Neispravan unos. Pokusajte ponovo:\n");
+			printf("Neispravan unos. Pokusajte ponovo\n\n");
 			break;
 		}
 	}
@@ -43,11 +55,13 @@ int UI(receiptP head) {
 
 int separatorUI() {
 	int i;
+		
+	printf("\n");
 
 	for (i = 0;i < MAX;i++) {
 		printf("=");
 	}
-	printf("\n");
+	printf("\n\n");
 
 	return 0;
 }
